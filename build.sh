@@ -36,4 +36,6 @@ while getopts ":c:b:M:" opt; do
     esac
 done
 cd yocto
-source ag-init-build-env $confprefix $build_dir $machine && echo
+source ag-init-build-env $confprefix $build_dir $machine
+echo $(pwd)
+MACHINE=$machine bitbake core-image-minimal && echo "BuildSuccess" || echo "BuildFailed"

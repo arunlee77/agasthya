@@ -1,20 +1,17 @@
 #!/bin/sh
 
 build="build"
-machine="qemux86_64"
+boardtype="qemux86_64"
 if [ "$1" == "" ]; then
-	echo " No conf option given"
-	exit 1
+	echo " No conf option given. Default is:"$boardtype
+else
+	boardtype=$1
 fi
 if [ "$2" == "" ]; then
 	echo "Buid dir is "build""
+else
+	build=$2
 fi
-if [ "$3" == "" ]; then
-        echo "Machine is "$machine
-fi
-
-build=$2
-machine=$3
 
 unset TEMPLATECONF
 unset OEROOT
@@ -24,7 +21,7 @@ if [ -z "$ROOT" ]; then
     ROOT=$(readlink -f "$ROOT")
 fi
 
-TEMPLATECONF=$ROOT/meta-agasthya/conf/${1}
+TEMPLATECONF=$ROOT/meta-agasthya/conf/${boardtype}
 
 #../poky/oe-init-build-env
 if [ -z "$OEROOT" ]; then
@@ -36,8 +33,6 @@ echo "conf values"
 echo "ROOT: "         $ROOT
 echo "OEROOT: "       $OEROOT
 echo "TEMPLATECONF: " $TEMPLATECONF
-echo "MACHINE: "      $machine
 
 POKY="$(pwd)/../sources/poky/oe-init-build-env"
 source $POKY $build
-MACHINE=$machine bitbake core-image-minimal

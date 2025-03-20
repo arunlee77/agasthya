@@ -11,6 +11,7 @@ import re
 
 process = None
 is_running = False
+machine_option=""
 
 def close_window():
     import os, signal
@@ -19,7 +20,25 @@ def close_window():
         os.killpg(os.getpid(), signal.SIGTERM)
     else:
         os.killpg(os.getpgid(process.pid), signal.SIGTERM)
-        
+
+def clean_script():
+    prefix="rm -rf "
+    command=prefix+os.getcwd()+"/yocto/build/conf"
+    print(command)
+    os.system(command)
+    command=prefix+os.getcwd()+"/yocto/rasp_pi_build/conf"
+    print(command)
+    os.system(command)
+    command=prefix+os.getcwd()+"/yocto/rock_pi_build/conf"
+    print(command)
+    os.system(command)
+    command=prefix+os.getcwd()+"/yocto/qemux86_64_build/conf"
+    print(command)
+    os.system(command)
+    command=prefix+os.getcwd()+"/yocto/qemuarm64_build/conf"
+    print(command)
+    os.system(command)
+
 def stop_script():
     import os, signal
     global process
@@ -38,6 +57,7 @@ def stop_script():
 def run_script():
     global process
     global is_running
+    global machine_option
     stop_button.config(bg='red', state="active")
     is_running = True
     board_option = board_dropdown.get()
@@ -74,13 +94,26 @@ def update_output():
         try:
             output = process.stdout.readline()
             if process is not None and output == '' and process.poll() is not None:
+                is_running = False
+                stop_script()
                 break
         except Exception as e:
             #messagebox.showinfo("FullFlash", "CANNOT FLASH")
+            is_running = False
+            messagebox.showinfo("Error", str(e))
             return
         #Todo search the output and decide the progress of the script
         textbox.insert(tk.END, output)
         textbox.see(tk.END)  # Scroll to the end of the textbox
+        if output.find("BuildSuccess") != -1:
+            is_running = False
+            stop_script()
+            break
+        if output.find("BuildFailed") != -1:
+            is_running = False
+            stop_script()
+            messagebox.showinfo("Error", "Build Failed")
+            break
 
 # Create the main window
 root = tk.Tk()
@@ -105,7 +138,7 @@ frame.pack(pady=10)
 # Dropdown options
 boardoptions = ["qemux86_64", "qemuarm64", "x86_64", "rasp_pi", "rock_pi"]
 builddiroptions = ["build", "rasp_pi_build", "rock_pi_build", "qemux86_64_buid", "qemuarm64_build"]
-machineoptions = ["qemux86_64", "qemuarm64", "x86_64", "raspberrypi4-64", "rockpi-4b-rk3399"]
+machineoptions = ["qemux86-64", "qemuarm64", "x86_64", "raspberrypi4-64", "rockpi-4b-rk3399"]
 
 group_dropdown1 = tk.Frame(frame)
 tk.Label(group_dropdown1, text="Board:").pack(side=tk.LEFT, padx=5)
@@ -143,6 +176,10 @@ stop_button.pack(side=tk.LEFT, padx=5)
 
 stop_button.config(bg='grey', state="disabled")
 run_button.config(bg='grey', state="active")
+
+# Button to run shell script
+clean_button = tk.Button(button_frame, text="Clean", command=clean_script)
+clean_button.pack(side=tk.LEFT, padx=5)
 
 
 # Output display
