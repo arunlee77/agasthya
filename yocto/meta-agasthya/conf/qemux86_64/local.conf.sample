@@ -18,21 +18,7 @@
 # You need to select a specific machine to target the build with. There are a selection
 # of emulated machines available which can boot and run in the QEMU emulator:
 #
-#MACHINE ?= "qemuarm"
-#MACHINE ?= "qemuarm64"
-#MACHINE ?= "qemumips"
-#MACHINE ?= "qemumips64"
-#MACHINE ?= "qemuppc"
-#MACHINE ?= "qemux86"
-#MACHINE ?= "qemux86-64"
-#
-# There are also the following hardware board target machines included for 
-# demonstration purposes:
-#
-#MACHINE ?= "beaglebone-yocto"
-#MACHINE ?= "genericx86"
 #MACHINE ?= "genericx86-64"
-#MACHINE ?= "edgerouter"
 #
 # This sets the default machine to be qemux86-64 if no other machine is selected:
 MACHINE ??= "qemux86-64"
